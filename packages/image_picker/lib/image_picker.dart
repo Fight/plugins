@@ -44,7 +44,8 @@ class ImagePicker {
       {@required ImageSource source,
       double maxWidth,
       double maxHeight,
-      int imageQuality}) async {
+      int imageQuality,
+      bool allowsEditing = true}) async {
     assert(source != null);
     assert(imageQuality == null || (imageQuality >= 0 && imageQuality <= 100));
 
@@ -62,7 +63,8 @@ class ImagePicker {
         'source': source.index,
         'maxWidth': maxWidth,
         'maxHeight': maxHeight,
-        'imageQuality': imageQuality
+        'imageQuality': imageQuality,
+        'allowsEditing': allowsEditing
       },
     );
 
@@ -78,12 +80,18 @@ class ImagePicker {
   /// in this call. You can then call [retrieveLostData] when your app relaunches to retrieve the lost data.
   static Future<File> pickVideo({
     @required ImageSource source,
+    bool allowsEditing = true,
+    int videoMaximumDuration = 1,
   }) async {
     assert(source != null);
+    assert(videoMaximumDuration != null || (videoMaximumDuration > 0));
+
     final String path = await _channel.invokeMethod<String>(
       'pickVideo',
       <String, dynamic>{
         'source': source.index,
+        'allowsEditing': allowsEditing,
+        'videoMaximumDuration': videoMaximumDuration
       },
     );
     return path == null ? null : File(path);
