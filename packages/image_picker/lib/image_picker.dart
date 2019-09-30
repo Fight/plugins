@@ -45,7 +45,7 @@ class ImagePicker {
       double maxWidth,
       double maxHeight,
       int imageQuality,
-      bool allowsEditing = true}) async {
+      bool allowsEditing = false}) async {
     assert(source != null);
     assert(imageQuality == null || (imageQuality >= 0 && imageQuality <= 100));
 
@@ -80,7 +80,7 @@ class ImagePicker {
   /// in this call. You can then call [retrieveLostData] when your app relaunches to retrieve the lost data.
   static Future<File> pickVideo({
     @required ImageSource source,
-    bool allowsEditing = true,
+    bool allowsEditing = false,
     int videoMaximumDuration = 1,
   }) async {
     assert(source != null);
