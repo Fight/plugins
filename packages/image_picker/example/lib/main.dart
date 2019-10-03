@@ -60,7 +60,7 @@ class _MyHomePageState extends State<MyHomePage> {
       await _playVideo(file);
     } else {
       try {
-        _imageFile = await ImagePicker.pickImage(source: source);
+        _imageFile = await ImagePicker.pickImage(source: source, imageQuality: 62, maxWidth: 480, maxHeight: 800);
         setState(() {});
       } catch (e) {
         _pickImageError = e;
