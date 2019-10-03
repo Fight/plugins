@@ -279,10 +279,16 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     }
     
     PHAsset *originalAsset = [FLTImagePickerPhotoAssetUtil getAssetFromImagePickerInfo:info];
-    if (!originalAsset || [info objectForKey: UIImagePickerControllerEditedImage] != nil) {
-      NSDictionary *info = [info mutableCopy];
-      // Image picked without an original asset (e.g. User took a photo directly)
-      [self saveImageWithPickerInfo:info image:image imageQuality:imageQuality];
+    int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
+
+    if (!originalAsset || allowsEditing) {
+      NSMutableDictionary *fixedInfo = [info mutableCopy];
+      if (allowsEditing) {
+        NSMutableDictionary *mediaMetadata = [fixedInfo[UIImagePickerControllerMediaMetadata] mutableCopy];
+        mediaMetadata[@"Orientation"] = [NSNumber numberWithInt: image.imageOrientation];
+        fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
+      }
+      [self saveImageWithPickerInfo:fixedInfo image:image imageQuality:imageQuality];
     } else {
       __weak typeof(self) weakSelf = self;
       [[PHImageManager defaultManager]
@@ -345,3 +351,4 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
 }
 
 @end
+

@@ -33,12 +33,16 @@
                maxHeight:(NSNumber *)maxHeight {
 
 
-  UIImage *imageToScale = [UIImage imageWithCGImage:image.CGImage
-                                              scale:1
-                                        orientation:UIImageOrientationUp];
+  if(image.imageOrientation != UIImageOrientationUp) {
+    image = [UIImage imageWithCGImage:image.CGImage
+                                scale:1
+                          orientation:UIImageOrientationUp];
 
-  double originalWidth = imageToScale.size.width;
-  double originalHeight = imageToScale.size.height;
+  }
+
+
+  double originalWidth = image.size.width;
+  double originalHeight = image.size.height;
 
   bool hasMaxWidth = maxWidth != (id)[NSNull null];
   bool hasMaxHeight = maxHeight != (id)[NSNull null];
@@ -81,7 +85,7 @@
 
 
   UIGraphicsBeginImageContextWithOptions(CGSizeMake(width, height), NO, 1.0);
-  [imageToScale drawInRect:CGRectMake(0, 0, width, height)];
+  [image drawInRect:CGRectMake(0, 0, width, height)];
 
   UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
