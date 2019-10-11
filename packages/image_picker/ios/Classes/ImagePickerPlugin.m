@@ -54,7 +54,7 @@ static const int SOURCE_GALLERY = 1;
                                     details:nil]);
     self.result = nil;
   }
-  
+
   if ([@"pickImage" isEqualToString:call.method]) {
     _imagePickerController = [[UIImagePickerController alloc] init];
     _imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
@@ -62,14 +62,14 @@ static const int SOURCE_GALLERY = 1;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage ];
     self.result = result;
     _arguments = call.arguments;
-    
+
     // Miaomi
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
     _imagePickerController.allowsEditing = allowsEditing;
     // Miaomi
-    
+
     int imageSource = [[_arguments objectForKey:@"source"] intValue];
-    
+
     switch (imageSource) {
       case SOURCE_CAMERA:
         [self checkCameraAuthorization];
@@ -92,21 +92,21 @@ static const int SOURCE_GALLERY = 1;
       (NSString *)kUTTypeMPEG4
     ];
     _imagePickerController.videoQuality = UIImagePickerControllerQualityTypeHigh;
-    
+
     self.result = result;
     _arguments = call.arguments;
-    
+
     // Miaomi
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
     _imagePickerController.allowsEditing = allowsEditing;
-    
+
     int videoMaximumDuration = [[_arguments objectForKey:@"videoMaximumDuration"] intValue];
     _imagePickerController.videoMaximumDuration = videoMaximumDuration;
     // Miaomi
-    
-    
+
+
     int imageSource = [[_arguments objectForKey:@"source"] intValue];
-    
+
     switch (imageSource) {
       case SOURCE_CAMERA:
         [self checkCameraAuthorization];
@@ -149,7 +149,7 @@ static const int SOURCE_GALLERY = 1;
 
 - (void)checkCameraAuthorization {
   AVAuthorizationStatus status = [AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeVideo];
-  
+
   switch (status) {
     case AVAuthorizationStatusAuthorized:
       [self showCamera];
@@ -254,18 +254,28 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     return;
   }
   if (videoURL != nil) {
-    self.result(videoURL.path);
+    //文件管理器
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *fileName = [videoURL lastPathComponent];
+    //创建视频的存放路径
+    NSString *path = [NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), fileName];
+    NSURL *mergeFileURL = [NSURL fileURLWithPath:path];
+    //通过文件管理器将视频存放的创建的路径中
+    [fm copyItemAtURL:[info objectForKey:UIImagePickerControllerMediaURL] toURL:mergeFileURL error:nil];
+
+
+    self.result(mergeFileURL.path);
     self.result = nil;
   } else {
     UIImage *image = [info objectForKey: UIImagePickerControllerEditedImage];
     if (image == nil) {
       image = [info objectForKey:UIImagePickerControllerOriginalImage];
     }
-    
+
     NSNumber *maxWidth = [_arguments objectForKey:@"maxWidth"];
     NSNumber *maxHeight = [_arguments objectForKey:@"maxHeight"];
     NSNumber *imageQuality = [_arguments objectForKey:@"imageQuality"];
-    
+
     if (![imageQuality isKindOfClass:[NSNumber class]]) {
       imageQuality = @1;
     } else if (imageQuality.intValue < 0 || imageQuality.intValue > 100) {
@@ -273,11 +283,11 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     } else {
       imageQuality = @([imageQuality floatValue] / 100);
     }
-    
+
     if (maxWidth != (id)[NSNull null] || maxHeight != (id)[NSNull null]) {
       image = [FLTImagePickerImageUtil scaledImage:image maxWidth:maxWidth maxHeight:maxHeight];
     }
-    
+
     PHAsset *originalAsset = [FLTImagePickerPhotoAssetUtil getAssetFromImagePickerInfo:info];
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
 
@@ -311,7 +321,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   [_imagePickerController dismissViewControllerAnimated:YES completion:nil];
   self.result(nil);
-  
+
   self.result = nil;
   _arguments = nil;
 }

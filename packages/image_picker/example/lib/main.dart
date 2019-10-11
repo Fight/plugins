@@ -57,6 +57,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     if (isVideo) {
       final File file = await ImagePicker.pickVideo(source: source, allowsEditing: true, videoMaximumDuration: 3);
+      debugPrint("file: ${file.path}");
+      final bytes = await file.readAsBytes();
+      debugPrint("lenght: ${bytes.length})");
       await _playVideo(file);
     } else {
       try {
