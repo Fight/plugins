@@ -31,16 +31,6 @@
 + (UIImage *)scaledImage:(UIImage *)image
                 maxWidth:(NSNumber *)maxWidth
                maxHeight:(NSNumber *)maxHeight {
-
-
-  if(image.imageOrientation != UIImageOrientationUp) {
-    image = [UIImage imageWithCGImage:image.CGImage
-                                scale:1
-                          orientation:UIImageOrientationUp];
-
-  }
-
-
   double originalWidth = image.size.width;
   double originalHeight = image.size.height;
 
@@ -82,7 +72,9 @@
   // Scaling the image always rotate itself based on the current imageOrientation of the original
   // Image. Set to orientationUp for the orignal image before scaling, so the scaled image doesn't
   // mess up with the pixels.
-
+  UIImage *imageToScale = [UIImage imageWithCGImage:image.CGImage
+                                              scale:1
+                                        orientation:UIImageOrientationUp];
 
   // The image orientation is manually set to UIImageOrientationUp which swapped the aspect ratio in
   // some scenarios. For example, when the original image has orientation left, the horizontal
@@ -99,7 +91,7 @@
   }
 
   UIGraphicsBeginImageContextWithOptions(CGSizeMake(width, height), NO, 1.0);
-  [image drawInRect:CGRectMake(0, 0, width, height)];
+  [imageToScale drawInRect:CGRectMake(0, 0, width, height)];
 
   UIImage *scaledImage = UIGraphicsGetImageFromCurrentImageContext();
   UIGraphicsEndImageContext();
