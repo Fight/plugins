@@ -254,18 +254,30 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     return;
   }
   if (videoURL != nil) {
-    //文件管理器
-    NSFileManager *fm = [NSFileManager defaultManager];
-    NSString *fileName = [videoURL lastPathComponent];
-    //创建视频的存放路径
-    NSString *path = [NSString stringWithFormat:@"%@%@", NSTemporaryDirectory(), fileName];
-    NSURL *mergeFileURL = [NSURL fileURLWithPath:path];
-    //通过文件管理器将视频存放的创建的路径中
-    [fm copyItemAtURL:[info objectForKey:UIImagePickerControllerMediaURL] toURL:mergeFileURL error:nil];
+    if (@available(iOS 13.0, *)) {
+      NSString *fileName = [videoURL lastPathComponent];
+      NSURL *destination =
+          [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
 
+      if ([[NSFileManager defaultManager] isReadableFileAtPath:[videoURL path]]) {
+        NSError *error;
+        if (![[videoURL path] isEqualToString:[destination path]]) {
+          [[NSFileManager defaultManager] copyItemAtURL:videoURL toURL:destination error:&error];
 
-    self.result(mergeFileURL.path);
+          if (error) {
+            self.result([FlutterError errorWithCode:@"flutter_image_picker_copy_video_error"
+                                            message:@"Could not cache the video file."
+                                            details:nil]);
+            self.result = nil;
+            return;
+          }
+        }
+        videoURL = destination;
+      }
+    }
+    self.result(videoURL.path);
     self.result = nil;
+
   } else {
     UIImage *image = [info objectForKey: UIImagePickerControllerEditedImage];
     if (image == nil) {
