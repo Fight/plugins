@@ -35,7 +35,7 @@
   if (originalImageData) {
     type = [FLTImagePickerMetaDataUtil getImageMIMETypeFromImageData:originalImageData];
     suffix =
-        [FLTImagePickerMetaDataUtil imageTypeSuffixFromType:type] ?: kFLTImagePickerDefaultSuffix;
+    [FLTImagePickerMetaDataUtil imageTypeSuffixFromType:type] ?: kFLTImagePickerDefaultSuffix;
     metaData = [FLTImagePickerMetaDataUtil getMetaDataFromImageData:originalImageData];
   }
   if (type == FLTImagePickerMIMETypeGIF) {
@@ -90,17 +90,17 @@
                             gifInfo:(GIFInfo *)gifInfo
                                path:(NSString *)path {
   CGImageDestinationRef destination = CGImageDestinationCreateWithURL(
-      (CFURLRef)[NSURL fileURLWithPath:path], kUTTypeGIF, gifInfo.images.count, NULL);
+                                                                      (CFURLRef)[NSURL fileURLWithPath:path], kUTTypeGIF, gifInfo.images.count, NULL);
 
   NSDictionary *frameProperties = [NSDictionary
-      dictionaryWithObject:[NSDictionary
-                               dictionaryWithObject:[NSNumber numberWithFloat:gifInfo.interval]
-                                             forKey:(NSString *)kCGImagePropertyGIFDelayTime]
-                    forKey:(NSString *)kCGImagePropertyGIFDictionary];
+                                   dictionaryWithObject:[NSDictionary
+                                                         dictionaryWithObject:[NSNumber numberWithFloat:gifInfo.interval]
+                                                         forKey:(NSString *)kCGImagePropertyGIFDelayTime]
+                                   forKey:(NSString *)kCGImagePropertyGIFDictionary];
 
   NSMutableDictionary *gifMetaProperties = [NSMutableDictionary dictionaryWithDictionary:metaData];
   NSMutableDictionary *gifProperties =
-      (NSMutableDictionary *)gifMetaProperties[(NSString *)kCGImagePropertyGIFDictionary];
+  (NSMutableDictionary *)gifMetaProperties[(NSString *)kCGImagePropertyGIFDictionary];
   if (gifMetaProperties == nil) {
     gifProperties = [NSMutableDictionary dictionary];
   }

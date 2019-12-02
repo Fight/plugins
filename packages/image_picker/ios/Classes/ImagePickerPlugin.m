@@ -60,6 +60,7 @@ static const int SOURCE_GALLERY = 1;
     _imagePickerController.modalPresentationStyle = UIModalPresentationCurrentContext;
     _imagePickerController.delegate = self;
     _imagePickerController.mediaTypes = @[ (NSString *)kUTTypeImage ];
+
     self.result = result;
     _arguments = call.arguments;
 
@@ -103,7 +104,6 @@ static const int SOURCE_GALLERY = 1;
     int videoMaximumDuration = [[_arguments objectForKey:@"videoMaximumDuration"] intValue];
     _imagePickerController.videoMaximumDuration = videoMaximumDuration;
     // Miaomi
-
 
     int imageSource = [[_arguments objectForKey:@"source"] intValue];
 
@@ -257,7 +257,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     if (@available(iOS 13.0, *)) {
       NSString *fileName = [videoURL lastPathComponent];
       NSURL *destination =
-          [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+      [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
 
       if ([[NSFileManager defaultManager] isReadableFileAtPath:[videoURL path]]) {
         NSError *error;
@@ -279,7 +279,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     self.result = nil;
 
   } else {
-    UIImage *image = [info objectForKey: UIImagePickerControllerEditedImage];
+    UIImage *image = [info objectForKey:UIImagePickerControllerEditedImage];
     if (image == nil) {
       image = [info objectForKey:UIImagePickerControllerOriginalImage];
     }
@@ -303,14 +303,15 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     PHAsset *originalAsset = [FLTImagePickerPhotoAssetUtil getAssetFromImagePickerInfo:info];
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
 
-    if (!originalAsset || allowsEditing) {
+    if (allowsEditing) {
       NSMutableDictionary *fixedInfo = [info mutableCopy];
-      if (allowsEditing) {
-        NSMutableDictionary *mediaMetadata = [fixedInfo[UIImagePickerControllerMediaMetadata] mutableCopy];
-        mediaMetadata[@"Orientation"] = [NSNumber numberWithInt: image.imageOrientation];
-        fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
-      }
+//      NSMutableDictionary *mediaMetadata = [fixedInfo[UIImagePickerControllerMediaMetadata] mutableCopy];
+//      mediaMetadata[@"Orientation"] = [NSNumber numberWithInt: image.imageOrientation.raw];
+//      fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
       [self saveImageWithPickerInfo:fixedInfo image:image imageQuality:imageQuality];
+    } else if (!originalAsset) {
+      // Image picked without an original asset (e.g. User took a photo directly)
+      [self saveImageWithPickerInfo:info image:image imageQuality:imageQuality];
     } else {
       __weak typeof(self) weakSelf = self;
       [[PHImageManager defaultManager]
@@ -373,4 +374,3 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
 }
 
 @end
-
