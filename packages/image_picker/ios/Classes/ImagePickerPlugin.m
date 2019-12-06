@@ -30,12 +30,12 @@ static const int SOURCE_GALLERY = 1;
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
   FlutterMethodChannel *channel =
-  [FlutterMethodChannel methodChannelWithName:@"plugins.flutter.io/image_picker"
-                              binaryMessenger:[registrar messenger]];
+      [FlutterMethodChannel methodChannelWithName:@"plugins.flutter.io/image_picker"
+                                  binaryMessenger:[registrar messenger]];
   UIViewController *viewController =
-  [UIApplication sharedApplication].delegate.window.rootViewController;
+      [UIApplication sharedApplication].delegate.window.rootViewController;
   FLTImagePickerPlugin *instance =
-  [[FLTImagePickerPlugin alloc] initWithViewController:viewController];
+      [[FLTImagePickerPlugin alloc] initWithViewController:viewController];
   [registrar addMethodCallDelegate:instance channel:channel];
 }
 
@@ -68,7 +68,6 @@ static const int SOURCE_GALLERY = 1;
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
     _imagePickerController.allowsEditing = allowsEditing;
     // Miaomi
-
     int imageSource = [[_arguments objectForKey:@"source"] intValue];
 
     switch (imageSource) {
@@ -98,9 +97,6 @@ static const int SOURCE_GALLERY = 1;
     _arguments = call.arguments;
 
     // Miaomi
-    int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
-    _imagePickerController.allowsEditing = allowsEditing;
-
     int videoMaximumDuration = [[_arguments objectForKey:@"videoMaximumDuration"] intValue];
     _imagePickerController.videoMaximumDuration = videoMaximumDuration;
     // Miaomi
@@ -157,18 +153,18 @@ static const int SOURCE_GALLERY = 1;
     case AVAuthorizationStatusNotDetermined: {
       [AVCaptureDevice requestAccessForMediaType:AVMediaTypeVideo
                                completionHandler:^(BOOL granted) {
-        if (granted) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            if (granted) {
-              [self showCamera];
-            }
-          });
-        } else {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            [self errorNoCameraAccess:AVAuthorizationStatusDenied];
-          });
-        }
-      }];
+                                 if (granted) {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                     if (granted) {
+                                       [self showCamera];
+                                     }
+                                   });
+                                 } else {
+                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                     [self errorNoCameraAccess:AVAuthorizationStatusDenied];
+                                   });
+                                 }
+                               }];
     }; break;
     case AVAuthorizationStatusDenied:
     case AVAuthorizationStatusRestricted:
@@ -243,7 +239,7 @@ static const int SOURCE_GALLERY = 1;
 }
 
 - (void)imagePickerController:(UIImagePickerController *)picker
-didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
+    didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
   NSURL *videoURL = [info objectForKey:UIImagePickerControllerMediaURL];
   [_imagePickerController dismissViewControllerAnimated:YES completion:nil];
   // The method dismissViewControllerAnimated does not immediately prevent
@@ -257,7 +253,7 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     if (@available(iOS 13.0, *)) {
       NSString *fileName = [videoURL lastPathComponent];
       NSURL *destination =
-      [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
+          [NSURL fileURLWithPath:[NSTemporaryDirectory() stringByAppendingPathComponent:fileName]];
 
       if ([[NSFileManager defaultManager] isReadableFileAtPath:[videoURL path]]) {
         NSError *error;
@@ -301,31 +297,31 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
     }
 
     PHAsset *originalAsset = [FLTImagePickerPhotoAssetUtil getAssetFromImagePickerInfo:info];
+    
     int allowsEditing = [[_arguments objectForKey:@"allowsEditing"] boolValue];
-
     if (allowsEditing) {
-      NSMutableDictionary *fixedInfo = [info mutableCopy];
-//      NSMutableDictionary *mediaMetadata = [fixedInfo[UIImagePickerControllerMediaMetadata] mutableCopy];
-//      mediaMetadata[@"Orientation"] = [NSNumber numberWithInt: image.imageOrientation.raw];
-//      fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
-      [self saveImageWithPickerInfo:fixedInfo image:image imageQuality:imageQuality];
+        NSMutableDictionary *fixedInfo = [info mutableCopy];
+        NSMutableDictionary *mediaMetadata = [fixedInfo[UIImagePickerControllerMediaMetadata] mutableCopy];
+        mediaMetadata[@"Orientation"] = [NSNumber numberWithInt: image.imageOrientation];
+        fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
+        [self saveImageWithPickerInfo:fixedInfo image:image imageQuality:imageQuality];
     } else if (!originalAsset) {
       // Image picked without an original asset (e.g. User took a photo directly)
       [self saveImageWithPickerInfo:info image:image imageQuality:imageQuality];
     } else {
       __weak typeof(self) weakSelf = self;
       [[PHImageManager defaultManager]
-       requestImageDataForAsset:originalAsset
-       options:nil
-       resultHandler:^(NSData *_Nullable imageData, NSString *_Nullable dataUTI,
-                       UIImageOrientation orientation, NSDictionary *_Nullable info) {
-        // maxWidth and maxHeight are used only for GIF images.
-        [weakSelf saveImageWithOriginalImageData:imageData
-                                           image:image
-                                        maxWidth:maxWidth
-                                       maxHeight:maxHeight
-                                    imageQuality:imageQuality];
-      }];
+          requestImageDataForAsset:originalAsset
+                           options:nil
+                     resultHandler:^(NSData *_Nullable imageData, NSString *_Nullable dataUTI,
+                                     UIImageOrientation orientation, NSDictionary *_Nullable info) {
+                       // maxWidth and maxHeight are used only for GIF images.
+                       [weakSelf saveImageWithOriginalImageData:imageData
+                                                          image:image
+                                                       maxWidth:maxWidth
+                                                      maxHeight:maxHeight
+                                                   imageQuality:imageQuality];
+                     }];
     }
   }
   _arguments = nil;
@@ -345,11 +341,11 @@ didFinishPickingMediaWithInfo:(NSDictionary<NSString *, id> *)info {
                              maxHeight:(NSNumber *)maxHeight
                           imageQuality:(NSNumber *)imageQuality {
   NSString *savedPath =
-  [FLTImagePickerPhotoAssetUtil saveImageWithOriginalImageData:originalImageData
-                                                         image:image
-                                                      maxWidth:maxWidth
-                                                     maxHeight:maxHeight
-                                                  imageQuality:imageQuality];
+      [FLTImagePickerPhotoAssetUtil saveImageWithOriginalImageData:originalImageData
+                                                             image:image
+                                                          maxWidth:maxWidth
+                                                         maxHeight:maxHeight
+                                                      imageQuality:imageQuality];
   [self handleSavedPath:savedPath];
 }
 

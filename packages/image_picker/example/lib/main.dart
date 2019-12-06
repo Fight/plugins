@@ -58,14 +58,15 @@ class _MyHomePageState extends State<MyHomePage> {
       await _controller.setVolume(0.0);
     }
     if (isVideo) {
-      final File file = await ImagePicker.pickVideo(source: source, allowsEditing: true, videoMaximumDuration: 3);
+//      final File file = await ImagePicker.pickVideo(source: source);
+      final File file = await ImagePicker.pickVideo(source: source, videoMaximumDuration: 3);
       debugPrint("file: ${file.path}");
       final bytes = await file.readAsBytes();
       debugPrint("lenght: ${bytes.length})");
       await _playVideo(file);
     } else {
       try {
-        _imageFile = await ImagePicker.pickImage(source: source, allowsEditing: true, imageQuality: 62, maxWidth: 480, maxHeight: 800);
+        _imageFile = await ImagePicker.pickImage(source: source, allowsEditing: true);
         setState(() {});
       } catch (e) {
         _pickImageError = e;
