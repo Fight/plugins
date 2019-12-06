@@ -8,7 +8,8 @@ dependencies:
     sdk: flutter
   image_picker:
     path: ../
-
+  flutter_native_image:
+    git: https://github.com/btastic/flutter_native_image.git
 flutter:
   uses-material-design: true
 

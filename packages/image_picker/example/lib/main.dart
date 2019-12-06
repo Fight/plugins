@@ -8,6 +8,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_native_image/flutter_native_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 
@@ -66,7 +67,13 @@ class _MyHomePageState extends State<MyHomePage> {
       await _playVideo(file);
     } else {
       try {
-        _imageFile = await ImagePicker.pickImage(source: source, allowsEditing: true);
+        _imageFile = await ImagePicker.pickImage(source: source, allowsEditing: false);
+
+        ImageProperties properties = await FlutterNativeImage.getImageProperties(_imageFile.path);
+        _imageFile = await FlutterNativeImage.compressImage(_imageFile.path, quality: 80,
+            targetWidth: 600,
+            targetHeight: (properties.height * 600 / properties.width).round());
+
         setState(() {});
       } catch (e) {
         _pickImageError = e;

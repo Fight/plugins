@@ -306,7 +306,6 @@ static const int SOURCE_GALLERY = 1;
         fixedInfo[UIImagePickerControllerMediaMetadata] = mediaMetadata;
         [self saveImageWithPickerInfo:fixedInfo image:image imageQuality:imageQuality];
     } else if (!originalAsset) {
-      // Image picked without an original asset (e.g. User took a photo directly)
       [self saveImageWithPickerInfo:info image:image imageQuality:imageQuality];
     } else {
       __weak typeof(self) weakSelf = self;
